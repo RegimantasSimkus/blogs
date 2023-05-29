@@ -1,10 +1,10 @@
 ## Introduction
 
-The [Steam Overlay](https://partner.steamgames.com/doc/features/overlay) is an interface for interacting with Steam from within a Game. The overlay works by hooking onto the creation of the rendering device to get a handle to the device in order to be able to hook the rendering methods found within the VTable.
+The [Steam Overlay](https://partner.steamgames.com/doc/features/overlay) is an interface for interacting with Steam from within a game. The overlay works by hooking onto the creation of the rendering device to get a handle to the created device in order to hook the rendering methods found within the VTable.
 
 The Steam Overlay is loaded into the game as GameOverlayRenderer.dll or GameOverlayRenderer64.dll depending on whether the game is an x86 or x64 process.
 
-Since what i'm looking to do is hook the overlay for CS:GO which is an x86 process I will be reverse engineering GameOverlayRenderer.dll to get a further understanding.
+Since what i'm looking to do is hook the overlay for CS:GO which is an x86 process I will be reverse engineering GameOverlayRenderer.dll to get a deeper understanding of how it works.
 
 ## Reverse Engineering with IDA Pro
 Having opened the dll with IDA Pro you find that there are 14 exported functions as well as the entrypoint for the binary. 
@@ -46,7 +46,7 @@ Which provides an extensive list of results which doesn't give too much informat
 
 ## Reverse Engineering with C++ and Cheat Engine
 Since the hooking of a function is the process of inserting a JMP at the start which goes to your own hook we can see this in memory and follow the jump which will lead us straight to Steam's rendering hook.
-In order to find the function I'm looking for, in this case, IDirect3DDevice9::Present(), I need to find a pointer to the game's D3DDevice. There is a way of dynamically fetching a pointer to this by creating your own D3D device which can be used to create the interface that points to the same handle as CS:GO's.\
+In order to find the function I'm looking for, in this case, IDirect3DDevice9::Present(), I need to find a pointer to the game's D3DDevice. There is a way of dynamically fetching a pointer to this by creating your own D3D device which can be used to create the interface that points to the same handle as CS:GO's.
 
 The same method of retrieving the device is used in my open source CS:GO cheat which can be found [here](https://github.com/BullyHunter32/Bullyware-CSGO/blob/3d51da8cbaacb9fb436a00252545d03a8af8c4a0/Bullyware-CSGO/Bullyware/Render/D3DDevice.cpp#L6-L33).
 ```
@@ -86,18 +86,18 @@ The function is in index 17 meaning the function can be found at `VTable+(17*4)`
 
 Using the Sturcture disect view of Cheat Engine & inputting the address of the device I can look for the 17th function which is at offset 17\*4/68/0x44.\
 ![image](https://github.com/RegiSimkus/blogs/assets/91128330/59244937-c9dd-4e4e-84f0-232ba5094c6f)\
-Using the Memory View which gives a view of the live code in RAM we can see a JMP to an address with no symbols loaded which is likely an address that was dynamically allocated by the OS.
+Using the Memory View which gives a view of the live code in RAM we can see a JMP to an address with no symbols loaded which is likely an area in memory that was dynamically allocated by the OS.
 ![image](https://github.com/RegiSimkus/blogs/assets/91128330/78607486-1ea4-47bf-8543-5f76b6f4e2f9)\
 Following the JMP takes us to another JMP to the gameoverlayrenderer binary.\
-![image](https://github.com/RegiSimkus/blogs/assets/91128330/962a8e4d-9bc6-4c03-b806-7fb7976e539d)
+![image](https://github.com/RegiSimkus/blogs/assets/91128330/962a8e4d-9bc6-4c03-b806-7fb7976e539d)\
 which indicates that this is the hook.\
-![image](https://github.com/RegiSimkus/blogs/assets/91128330/0c2dc160-2e83-4a89-9396-be15d3446ede)\
+![image](https://github.com/RegiSimkus/blogs/assets/91128330/0c2dc160-2e83-4a89-9396-be15d3446ede)
 
-This means that we can dynamically and easily hook the Steam Overlay's Present by either generating a code signature, or more reliably for CSGO, can follow the two jumps.\
+This means that we can dynamically and easily hook the Steam Overlay's Present by either generating a code signature, or more reliably for CSGO, can follow the two jumps.
 
 ## Conclusion
 
-I have defined a wrapper for following JMPs as
+I have defined a wrapper for following the two JMPs as
 ```
 	inline PVOID EvaluateRelASM(PVOID pAddy)
 	{
