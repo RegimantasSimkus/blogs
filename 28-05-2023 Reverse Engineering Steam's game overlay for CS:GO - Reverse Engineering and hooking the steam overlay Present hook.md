@@ -82,9 +82,9 @@ IDirect3DDevice9* GetD3DDevice()
 ![image](https://github.com/RegiSimkus/blogs/assets/91128330/2befe452-b652-4dff-901b-f30967492a60)\
 After retrieving a handle to the device we can then look through the assembly of the virtual methods as listed in the VTable. To find out which function I need to look at I can simply just reference the definition of the class as defined in `d3d9.h`.
 ![image](https://github.com/RegiSimkus/blogs/assets/91128330/c104d204-7def-441e-a554-43f72e4a7ff4)\
-The function is in index 17 meaning the function can be found at `VTable+(17*4)`.
+The function is in index 17 meaning the function can be found at `VTable+(17*4)` 17 for the 17th index, 4 since that's the size of a pointer in an x86 process.
 
-Using the Sturcture disect view of Cheat Engine & inputting the address of the device I can look for the 17th function which is at offset 17\*4/68/0x44.\
+Using the Sturcture disect view of Cheat Engine & inputting the address of the device I can look for the 17th function which is at offset 0x44.\
 ![image](https://github.com/RegiSimkus/blogs/assets/91128330/59244937-c9dd-4e4e-84f0-232ba5094c6f)\
 Using the Memory View which gives a view of the live code in RAM we can see a JMP to an address with no symbols loaded which is likely an area in memory that was dynamically allocated by the OS.
 ![image](https://github.com/RegiSimkus/blogs/assets/91128330/78607486-1ea4-47bf-8543-5f76b6f4e2f9)\
@@ -112,8 +112,10 @@ I have defined a wrapper for following the two JMPs as
 		return (T)EvaluateRelASM(pAddy);
 	}
 ```
+The `pAddy + 1` is the address of the relative offset, dereferencing this as an integer gives you the value of the offset. Adding this to the address of the JMP takes you to the destination, but you must add the last 4 bytes to the address as it JMPs from the end of the instruction.
+jmpdiagram.png![image](https://github.com/RegiSimkus/blogs/assets/91128330/7a2d4e33-6331-40fc-ab47-ac932a368f5d)\
 
-Which can be used like so\
+Which can be used like so
 ```
 	// IDirect3DDevice9::Present
 	PVOID pPresent = (*(void***)g_pDevice)[17];
@@ -125,3 +127,5 @@ Which can be used like so\
 	Present = new CTrampHook((PVOID)pResolvedSteamPresent, (PVOID)hkPresent, 6, (PVOID*)(&oPresent));
 ```
 And just like that, we have the address of the hook, the IDirect3DDevice9 interface, and the static address of the function relative to gameoverlayrenderer.dll which is `0x66af0`.
+
+You can find the source code for my full cheat at https://github.com/BullyHunter32/Bullyware-CSGO/.
