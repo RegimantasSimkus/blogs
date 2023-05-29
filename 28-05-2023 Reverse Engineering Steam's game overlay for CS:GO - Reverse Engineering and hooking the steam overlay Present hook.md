@@ -113,7 +113,7 @@ I have defined a wrapper for following the two JMPs as
 	}
 ```
 The `pAddy + 1` is the address of the relative offset, dereferencing this as an integer gives you the value of the offset. Adding this to the address of the JMP takes you to the destination, but you must add the last 4 bytes to the address as it JMPs from the end of the instruction.
-jmpdiagram.png![image](https://github.com/RegiSimkus/blogs/assets/91128330/7a2d4e33-6331-40fc-ab47-ac932a368f5d)\
+![image](https://github.com/RegiSimkus/blogs/assets/91128330/7a2d4e33-6331-40fc-ab47-ac932a368f5d)\
 
 Which can be used like so
 ```
