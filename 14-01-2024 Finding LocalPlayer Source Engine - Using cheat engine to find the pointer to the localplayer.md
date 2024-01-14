@@ -23,25 +23,25 @@ You can click on one of them, whatever looks most interesting to you, I like the
 Clicking on the instruction, you can see the values in the registers at the time in the bottom part of cheat engine, take the value of rcx and add it to the address list.\
 ![image](https://github.com/RegiSimkus/blogs/assets/91128330/c7096af2-4246-4c7e-9e3f-c6a23f0d865a)
 
-Take that pointer and scan for it to see what addresses point to the localplayer. 8 bytes because i'm on a x64 version of the game where pointers are 8 bytes large, whereas x86 would be 4 bytes.
-![image](https://github.com/RegiSimkus/blogs/assets/91128330/81598616-929a-4c28-8162-e659ec25468f)
+Take that pointer and scan for it to see what addresses point to the localplayer. 8 bytes because i'm on a x64 version of the game where pointers are 8 bytes large, whereas x86 would be 4 bytes.\
+![image](https://github.com/RegiSimkus/blogs/assets/91128330/81598616-929a-4c28-8162-e659ec25468f)\
 
-Lots of garbage here at first glance
-![image](https://github.com/RegiSimkus/blogs/assets/91128330/0b191538-a9a5-4e52-b3df-7e97a1ada086)
-Scroll down a bit and wey hey!
-![image](https://github.com/RegiSimkus/blogs/assets/91128330/10a31869-7b3e-411d-a4c8-b8e369967508)
+Lots of garbage here at first glance\
+![image](https://github.com/RegiSimkus/blogs/assets/91128330/0b191538-a9a5-4e52-b3df-7e97a1ada086)\
+Scroll down a bit and wey hey!\
+![image](https://github.com/RegiSimkus/blogs/assets/91128330/10a31869-7b3e-411d-a4c8-b8e369967508)\
 The green ones are static addresses, it shows the offset relative to the process it's loaded into, in this case I have `client.dll+8E1540`, `client.dll+903B68` and `client.dll+9EEB38`. I'll add them to my address list by double clicking and keep them there.\
 Now i'm going to try invalidate them, do whatever I can without closing the game to set that value to something else, preferably zero. The obvious would be to disconnect from the server.\
-![image](https://github.com/RegiSimkus/blogs/assets/91128330/f5186918-c499-4340-bf21-7e8931f3ecf0)
+![image](https://github.com/RegiSimkus/blogs/assets/91128330/f5186918-c499-4340-bf21-7e8931f3ecf0)\
 I honestly wasn't expecting there to be any non-zero values but look where we are. Can remove that old faulty unreliable pointer.\
 Now with two left, i'm going to load back into my trust dedicated server, watching my cheat engine values checking whether they change.\
-And they're both valid!
-![image](https://github.com/RegiSimkus/blogs/assets/91128330/df6516f6-6bfa-4d31-98ff-17303e633e0c)
+And they're both valid!\
+![image](https://github.com/RegiSimkus/blogs/assets/91128330/df6516f6-6bfa-4d31-98ff-17303e633e0c)\
 \
 Just for peace of mind to be extra sure, can take both of those addresses in my address table and tick the 'pointer' box and apply an offset of C8 to find our health again. As health is an integer, set that to 4 bytes, don't want hexidecimal. And wey hey! It's 100.\
 \
-Remember, it's not the 'Address' you want, it's the offset to the dll!
-![image](https://github.com/RegiSimkus/blogs/assets/91128330/ec2b67d9-82f3-48cc-8a35-8ef8e141a500)
+Remember, it's not the 'Address' you want, it's the offset to the dll!\
+![image](https://github.com/RegiSimkus/blogs/assets/91128330/ec2b67d9-82f3-48cc-8a35-8ef8e141a500)\
 \
 You can use this in cpp code using something like
 ```cpp
